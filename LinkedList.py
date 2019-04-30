@@ -343,7 +343,7 @@ class LinkedList(object):
         new_list = LinkedList()
         current = self.first
 
-        # traverse through a list and keep track of all values in this new list
+        # traverse throughlist and keep track of all values in new list
         no_duplicates = []
 
         # check if value in link matches value in list
