@@ -1,0 +1,233 @@
+class Node(object):
+    def __init__(self, data=None):
+        self.data = data
+        self.lchild = None
+        self.rchild = None
+
+
+class Tree(object):
+    def __init__(self):
+        self.root = None
+
+    # Search for a node with given key
+    def search(self, key):
+        current = self.root
+        while ( (current != None) and (current.data != key) ):
+            if key < current.data:
+                current = current.lChild
+            else:
+                current = current.rChild
+        return current
+
+    # insert node into tree
+    def insert (self, value):
+        new_Node = Node(value)
+
+        if self.root == None:
+            self.root = new_Node
+        else:
+            current = self.root
+            parent = self.root
+            while current != None:
+                parent = current
+                if value < current.data:
+                    current = current.lchild
+                else:
+                    current = current.rchild
+
+            if value < parent.data:
+                parent.lchild = new_Node
+            else:
+                parent.rchild = new_Node
+
+    # TRAVERSALS - recursive
+    # in order traversal >> left, center, right
+    def in_order (self, aNode):
+        if aNode != None:
+            # left
+            self.in_order(aNode.lchild)
+            # center
+            print(aNode.data)
+            # right
+            self.in_order(aNode.rchild)
+
+
+    # pre order traversal >> center, left, right
+    def pre_order (self, aNode):
+        if aNode != None:
+            # center
+            print(aNode.data)
+            # left
+            self.pre_order(aNode.lchild)
+            # right
+            self.pre_order(aNode.rchild)
+
+
+    # post order traversal >> left, right, center
+    def post_order (self, aNode):
+        if aNode != None:
+            self.post_order(aNode.lchild)
+            self.post_order(aNode.rchild)
+            print(aNode.data)
+
+    # return node with minimum value
+    def minimum (self):
+        current = self.root
+        parent = current
+
+        while current != None:
+            parent = current
+            current = current.lchild
+
+        return parent
+
+    # return node with maximum
+    def maximum (self):
+        current = self.root
+        parent = current
+
+        while current != None:
+            parent = current
+            current = current.rchild
+
+        return parent
+
+    # delete a node with a given key
+    def delete(self, key):
+        deleteNode = self.root
+        parent = self.root
+        is_Left = False
+
+        # case for empty tree
+        if (deleteNode == None):
+            return False
+
+        # search for delete node
+        while ((deleteNode != None) and (deleteNode.data != key)):
+            parent = deleteNode
+            if key < deleteNode.data:
+                deleteNode = deleteNode.lchild
+                is_Left = True
+            else:
+                deleteNode = deleteNode.rchild
+                is_Left = False
+
+        # cannot find node
+        if (deleteNode == None):
+            return False
+
+        # case for deleteNode = leaf node
+        if (deleteNode.lchild == None) and (deleteNode.rchild == None):
+            if (deleteNode == self.root):
+                self.root = None
+            elif (is_Left):
+                parent.lchild = None
+            else:
+                parent.rchild = None
+
+        # case for deleteNode = node with just left child
+        elif deleteNode.rchild == None:
+            if deleteNode == self.root:
+                self.root = deleteNode.lchild
+            elif is_Left:
+                parent.lchild = deleteNode.lchild
+            else:
+                parent.rchild = deleteNode.lchild
+
+
+        # case for deleteNode = node with just right child
+        elif deleteNode.lchild == None:
+            if deleteNode == self.root:
+                self.root = deleteNode.lchild
+            elif is_Left:
+                parent.lchild = deleteNode.rchild
+            else:
+                parent.rchild = deleteNode.rchild
+
+
+        # deleteNode = node with both right and left children
+        else:
+            # find successor and successor's parent of deleteNode
+            next = deleteNode.rchild
+            nextParent = deleteNode
+
+            # left of the right subtree
+            while next.lchild != None:
+                nextParent = next
+                next = next.rchild
+
+            # next node right child of deleteNode
+            if deleteNode == self.root:
+                self.root = next
+            elif is_Left:
+                parent.lchild = next
+            else:
+                parent.rchild = next
+
+            # connect deleteNode lchild st it becomes next's lchild
+            next.lchild = deleteNode.lchild
+
+            # next node left child of deleteNode
+            if next != deleteNode.rchild:
+                nextParent.lchild = next.rchild
+                next.rchild = deleteNode.rchild
+
+        return True
+
+    # return tree height
+    def get_height (self, aNode):
+        if aNode == None:
+            return 0
+        else:
+            if aNode.lchild != None or aNode.rchild != None:
+                return 1 + max(self.get_height(aNode.lchild), self.get_height(aNode.rchild))
+            else:
+                return 0
+
+    # return number of nodes in given subtree
+    def num_nodes_subtree (self, aNode):
+        if aNode == None:
+            return 0
+        else:
+            return 1 + self.num_nodes_subtree(aNode.lchild) + self.num_nodes_subtree(aNode.rchild)
+
+
+    # return number of nodes in left subtree and in right subtree
+    def num_nodes (self):
+        if self.root != None:
+            left_root = self.root.lchild
+            right_root = self.root.rchild
+            num_left_nodes = self.num_nodes_subtree(left_root)
+            num_right_nodes = self.num_nodes_subtree(right_root)
+            return num_left_nodes + num_right_nodes + 1
+        else:
+            return 0
+
+    # is tree balanced
+    def is_balanced(self, aNode):
+        if (aNode.lchild and aNode.rchild):
+            balanced = True
+            self.is_balanced(aNode.lchild)
+            self.is_balanced(aNode.rchild)
+
+        elif (aNode.lchild is None) and (aNode.rchild is None):
+            balanced = True
+            return
+        else:
+            balanced = False
+            self.is_balanced(aNode)
+            return False
+
+        return balanced
+
+
+    # print nodes breadth first at given level
+    def print_level (self, aNode, level=1):
+        if level == 1:
+            if aNode != None:
+                print(aNode.data, end=' ')
+                return
+        else:
+            if aNode != None:
+                self.print_level(aNode.lchild, level - 1)
+                self.print_level(aNode.rchild, level - 1)
